@@ -1,7 +1,5 @@
 package fpinscala.gettingstarted
 
-import java.security.KeyStore.TrustedCertificateEntry
-
 // A comment!
 /* Another comment */
 /** A documentation comment */
