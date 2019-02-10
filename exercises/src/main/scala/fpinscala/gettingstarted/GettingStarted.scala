@@ -1,5 +1,7 @@
 package fpinscala.gettingstarted
 
+import java.security.KeyStore.TrustedCertificateEntry
+
 // A comment!
 /* Another comment */
 /** A documentation comment */
@@ -35,8 +37,14 @@ object MyModule {
   }
 
   // Exercise 1: Write a function to compute the nth fibonacci number
-
-  def fib(n: Int): Int = ???
+  def fib(n: Int): Int = {
+    @annotation.tailrec
+    def loop(iters: Int, prev: Int, cur: Int): Int = {
+      if (iters == 0) prev
+      else loop(iters - 1, cur, prev + cur)
+    }
+    loop(n, 0, 1)
+  }
 
   // This definition and `formatAbs` are very similar..
   private def formatFactorial(n: Int) = {
@@ -140,7 +148,15 @@ object PolymorphicFunctions {
 
   // Exercise 2: Implement a polymorphic function to check whether
   // an `Array[A]` is sorted
-  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = ???
+  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = {
+    @annotation.tailrec
+    def loop(i: Int): Boolean = {
+      if (i == as.length || as.length <= 1) true
+      else if (gt(as(i - 1), as(i))) false
+      else loop(i + 1)
+    }
+    return loop(1)
+  }
 
   // Polymorphic functions are often so constrained by their type
   // that they only have one implementation! Here's an example:
@@ -175,4 +191,23 @@ object PolymorphicFunctions {
 
   def compose[A,B,C](f: B => C, g: A => B): A => C =
     ???
+}
+
+object TestIsSorted {
+  import PolymorphicFunctions._
+  import scala.runtime.ScalaRunTime._
+
+  def main(args: Array[String]): Unit = {
+    val arrays = Array(
+      Array(), // true
+      Array(1), // true
+      Array(1, 2), // true
+      Array(1, 2, 3, 4, 5), // true
+      Array(1, 2, 4, 3, 5), // false
+      Array(1, 2, 3, 5, 4), // false
+      Array(2, 1, 3, 4, 5) // false
+    )
+    def gt(a: Int, b: Int): Boolean = a > b
+    for (as <- arrays) printf("%s: %b\n", stringOf(as), isSorted(as, gt))
+  }
 }
